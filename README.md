@@ -2,6 +2,8 @@
 
 Este repositorio contiene la página estática del mapa, el generador de datos desde Odoo y el flujo de publicación de GitHub Pages.
 
+[Abrir el mapa público](https://franraja.github.io/iwash-store-map/).
+
 ## Cómo se actualiza
 
 - El flujo se ejecuta el día 1 de cada mes a las 09:17, hora de Madrid.
@@ -39,5 +41,5 @@ La API externa JSON-2 de Odoo 19 requiere una clave Bearer. Odoo limita a tres m
 - data/locations-overrides.json: ubicaciones ya verificadas y publicadas.
 - data/initial-stores.json: captura pública mínima revisada del 23/10/2026 para la primera publicación manual.
 - scripts/sync_stores.py: consulta Odoo, filtra y prepara la lista pública.
-- .github/workflows/publish.yml: publicación mensual, manual y al actualizar main.
+- .github/workflows/publish.yml: publicación mensual y manual.
 
