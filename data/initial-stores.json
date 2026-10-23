@@ -1,0 +1,569 @@
+{
+  "generatedAt": "2026-10-23T11:55:14+00:00",
+  "stores": [
+    {
+      "name": "IWASH ALBOX",
+      "city": "Albox",
+      "province": "Almería",
+      "status": "open",
+      "address": "C/ PALMERAS Nº 8",
+      "lat": 37.3875,
+      "lng": -2.1437
+    },
+    {
+      "name": "IWASH ALCOY",
+      "city": "Alcoy",
+      "province": "Alicante",
+      "status": "open",
+      "address": "San Francesc, 16",
+      "lat": 38.697,
+      "lng": -0.473
+    },
+    {
+      "name": "IWASH ALICANTE",
+      "city": "Alicante",
+      "province": "Alicante",
+      "status": "open",
+      "address": "Avinguda Novelda, 25",
+      "lat": 38.3452,
+      "lng": -0.4815
+    },
+    {
+      "name": "IWASH ARCOS DE LA FRONTERA",
+      "city": "Arcos de la Frontera",
+      "province": "Cádiz",
+      "status": "open",
+      "address": "C. Carlos Saura, 58",
+      "lat": 36.75,
+      "lng": -5.8
+    },
+    {
+      "name": "IWASH ARGANDA DEL REY",
+      "city": "Arganda del Rey",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C. Vereda del Melero, 5",
+      "lat": 40.305,
+      "lng": -3.442
+    },
+    {
+      "name": "IWASH AZUQUECA DE HENARES",
+      "city": "Azuqueca de Henares",
+      "province": "Guadalajara",
+      "status": "open",
+      "address": "Avda. Guadalajara, 15",
+      "lat": 40.565,
+      "lng": -3.265
+    },
+    {
+      "name": "IWASH BAZA",
+      "city": "Baza",
+      "province": "Granada",
+      "status": "open",
+      "address": "C/ CADIZ Nº 2",
+      "lat": 37.49,
+      "lng": -2.77
+    },
+    {
+      "name": "IWASH CARRANQUE",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. Virgen de la Estrella, 13",
+      "lat": 36.715,
+      "lng": -4.435
+    },
+    {
+      "name": "IWASH CARRETERA DE CADIZ",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. del Jalón, 1",
+      "lat": 36.698,
+      "lng": -4.458
+    },
+    {
+      "name": "IWASH CARTAGENA",
+      "city": "Cartagena",
+      "province": "Murcia",
+      "status": "open",
+      "address": "C/ mayor 2 bajo",
+      "lat": 37.6051,
+      "lng": -0.9862
+    },
+    {
+      "name": "IWASH CASTELLÓN",
+      "city": "San Jordi",
+      "province": "Castellón",
+      "status": "upcoming"
+    },
+    {
+      "name": "IWASH CC COLOMBIA",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "Avenida Bucaramanga, 2",
+      "lat": 40.471,
+      "lng": -3.642
+    },
+    {
+      "name": "IWASH CEUTA",
+      "city": "Ceuta",
+      "province": "Ceuta",
+      "status": "upcoming",
+      "address": "Avenida Regulares 7 Bajo",
+      "lat": 35.8894,
+      "lng": -5.3198
+    },
+    {
+      "name": "IWASH CHAMBERÍ",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C. de Blasco de Garay, 82",
+      "lat": 40.435,
+      "lng": -3.705
+    },
+    {
+      "name": "IWASH CIUDAD JARDIN",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. Alcalde Nicolás Maroto, 6",
+      "lat": 36.74,
+      "lng": -4.425
+    },
+    {
+      "name": "IWASH COLLADO VILLALBA",
+      "city": "Collado Villalba",
+      "province": "Madrid",
+      "status": "open",
+      "address": "Calle Honorio Lozano 49",
+      "lat": 40.633,
+      "lng": -4.01
+    },
+    {
+      "name": "IWASH CÓRDOBA",
+      "city": "Córdoba",
+      "province": "Córdoba",
+      "status": "upcoming",
+      "address": "Calle Luís Ponce de León 16 Bajo",
+      "lat": 37.8882,
+      "lng": -4.7794
+    },
+    {
+      "name": "IWASH CRUZ DE HUMILLADERO",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C/ Sthendal, 11",
+      "lat": 36.712,
+      "lng": -4.445
+    },
+    {
+      "name": "IWASH DON BENITO",
+      "city": "Don Benito",
+      "province": "Badajoz",
+      "status": "open",
+      "address": "Av. de Madrid, 11",
+      "lat": 38.955,
+      "lng": -5.86
+    },
+    {
+      "name": "IWASH DOS HERMANAS (LAVAR Y LISTO)",
+      "city": "Dos Hermanas",
+      "province": "Sevilla",
+      "status": "open",
+      "address": "Av. de Adolfo Suárez, 10",
+      "lat": 37.282,
+      "lng": -5.922
+    },
+    {
+      "name": "IWASH ÉCIJA",
+      "city": "Écija",
+      "province": "Sevilla",
+      "status": "open",
+      "address": "C. Rda. San Agustín",
+      "lat": 37.54,
+      "lng": -5.08
+    },
+    {
+      "name": "IWASH ESTEPONA",
+      "city": "Estepona",
+      "province": "Málaga",
+      "status": "open",
+      "address": "Calle de la Guardia Civil, 2",
+      "lat": 36.427,
+      "lng": -5.145
+    },
+    {
+      "name": "IWASH GETAFE",
+      "city": "Getafe",
+      "province": "Madrid",
+      "status": "open",
+      "address": "Av. de las Ciudades, 16",
+      "lat": 40.3,
+      "lng": -3.73
+    },
+    {
+      "name": "IWASH GODELLA",
+      "city": "Godella",
+      "province": "Valencia",
+      "status": "open",
+      "address": "Carrer Sant Blas, 17",
+      "lat": 39.518,
+      "lng": -0.41
+    },
+    {
+      "name": "IWASH HORTALEZA",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C. de las Cuevas de Almanzora, 187",
+      "lat": 40.475,
+      "lng": -3.645
+    },
+    {
+      "name": "IWASH LA RODA DE ANDALUCÍA",
+      "city": "La Roda de Andalucía",
+      "province": "Sevilla",
+      "status": "open",
+      "address": "Calle Sevilla 89",
+      "lat": 37.2,
+      "lng": -4.75
+    },
+    {
+      "name": "IWASH LAS CHAPAS",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "Doctor Escassi, 1",
+      "lat": 36.505,
+      "lng": -4.762
+    },
+    {
+      "name": "IWASH LLEIDA 1",
+      "city": "Lleida",
+      "province": "Lleida",
+      "status": "open",
+      "address": "Carrer de la Llibertat, 42",
+      "lat": 41.6176,
+      "lng": 0.6206
+    },
+    {
+      "name": "IWASH LLEIDA 2",
+      "city": "Torrefarrera",
+      "province": "Lleida",
+      "status": "open",
+      "address": "L'Avinguda de Lleida, 6-8",
+      "lat": 41.7,
+      "lng": 0.58
+    },
+    {
+      "name": "IWASH LOGROÑO",
+      "city": "Logroño",
+      "province": "La Rioja",
+      "status": "upcoming",
+      "address": "C. Madre de Dios, 54",
+      "lat": 42.466,
+      "lng": -2.445
+    },
+    {
+      "name": "IWASH LÓPEZ DE HOYOS",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C/LOPEZ DE HOYOS, 343",
+      "lat": 40.465,
+      "lng": -3.655
+    },
+    {
+      "name": "IWASH MÁLAGA CENTRO",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. Mármoles, 58",
+      "lat": 36.726,
+      "lng": -4.428
+    },
+    {
+      "name": "IWASH MIGUEL ESTEBAN",
+      "city": "Miguel Esteban",
+      "province": "Toledo",
+      "status": "upcoming"
+    },
+    {
+      "name": "IWASH MOLLET DEL VALLES",
+      "city": "Mollet del Vallès",
+      "province": "Barcelona",
+      "status": "open",
+      "address": "C/ Francesc Ferrer i Guardia, 31",
+      "lat": 41.54,
+      "lng": 2.21
+    },
+    {
+      "name": "IWASH MORATALAZ (MADRID)",
+      "city": "Moratalaz",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C/ la Tacona, 13",
+      "lat": 40.4068,
+      "lng": -3.645
+    },
+    {
+      "name": "IWASH MURCIA",
+      "city": "Murcia",
+      "province": "Murcia",
+      "status": "upcoming",
+      "address": "C. Arquitecto Emilio Pérez Piñero nº 11",
+      "lat": 37.9922,
+      "lng": -1.1307
+    },
+    {
+      "name": "IWASH NERJA",
+      "city": "Nerja",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C/ Chillar, 2",
+      "lat": 36.745,
+      "lng": -3.875
+    },
+    {
+      "name": "IWASH PAMPLONA",
+      "city": "Pamplona",
+      "province": "Navarra",
+      "status": "open",
+      "address": "C. Santesteban, 3",
+      "lat": 42.8125,
+      "lng": -1.6458
+    },
+    {
+      "name": "IWASH PASEO DE LAS DELICIAS",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "PASEO DE LAS DELICIAS 130",
+      "lat": 40.398,
+      "lng": -3.695
+    },
+    {
+      "name": "IWASH PINTO",
+      "city": "Pinto",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C. de la Cañada Real de Toledo, 5",
+      "lat": 40.242,
+      "lng": -3.698
+    },
+    {
+      "name": "IWASH RIVAS VACIA MADRID",
+      "city": "Rivas-Vaciamadrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "P.º de las Provincias, 3",
+      "lat": 40.34,
+      "lng": -3.52
+    },
+    {
+      "name": "IWASH ROLDÁN",
+      "city": "Roldán",
+      "province": "Murcia",
+      "status": "open",
+      "address": "Av. Balsicas, 21",
+      "lat": 37.795,
+      "lng": -0.99
+    },
+    {
+      "name": "IWASH RONDA",
+      "city": "Ronda",
+      "province": "Málaga",
+      "status": "open",
+      "address": "Av. Málaga, 26",
+      "lat": 36.74,
+      "lng": -5.16
+    },
+    {
+      "name": "IWASH SABADELL",
+      "city": "Sabadell",
+      "province": "Barcelona",
+      "status": "open",
+      "address": "C. Sau, 98",
+      "lat": 41.5433,
+      "lng": 2.1094
+    },
+    {
+      "name": "IWASH SALAMANCA",
+      "city": "Salamanca",
+      "province": "Salamanca",
+      "status": "open",
+      "address": "AV. FILIBERTO VILLALOBOS, 2",
+      "lat": 40.97,
+      "lng": -5.66
+    },
+    {
+      "name": "IWASH SAN FERNANDO DE HENARES",
+      "city": "San Fernando de Henares",
+      "province": "Madrid",
+      "status": "open",
+      "address": "Calle Motrico 11 / local 19",
+      "lat": 40.425,
+      "lng": -3.535
+    },
+    {
+      "name": "IWASH SAN JAVIER",
+      "city": "San Javier",
+      "province": "Murcia",
+      "status": "open",
+      "address": "Av. Ramón y Cajal 12",
+      "lat": 37.805,
+      "lng": -0.835
+    },
+    {
+      "name": "IWASH SAN SEBASTIAN",
+      "city": "San Sebastián",
+      "province": "Guipúzcoa",
+      "status": "upcoming"
+    },
+    {
+      "name": "IWASH Sant Pere de Riudebitlles",
+      "city": "Sant Pere de Riudebitlles",
+      "province": "Barcelona",
+      "status": "open",
+      "address": "Carrer la Carretera, 41",
+      "lat": 41.446,
+      "lng": 1.704
+    },
+    {
+      "name": "IWASH SANTANDER",
+      "city": "Santander",
+      "province": "Cantabria",
+      "status": "open",
+      "address": "C/Guevara, 22 dcha local",
+      "lat": 43.4623,
+      "lng": -3.8099
+    },
+    {
+      "name": "IWASH SEGOVIA",
+      "city": "Segovia",
+      "province": "Segovia",
+      "status": "upcoming"
+    },
+    {
+      "name": "IWASH SOHO",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. Canales, 1",
+      "lat": 36.715,
+      "lng": -4.425
+    },
+    {
+      "name": "IWASH SONSECA",
+      "city": "Sonseca",
+      "province": "Toledo",
+      "status": "open",
+      "address": "C/ Rabana 13",
+      "lat": 39.678,
+      "lng": -3.974
+    },
+    {
+      "name": "IWASH TALAVERA DE LA REINA",
+      "city": "El Casar de Talavera",
+      "province": "Toledo",
+      "status": "upcoming",
+      "address": "El Pilón nº 2",
+      "lat": 39.961,
+      "lng": -4.834
+    },
+    {
+      "name": "IWASH TORREMOLINOS",
+      "city": "Torremolinos",
+      "province": "Málaga",
+      "status": "open",
+      "address": "C. Río Bergantes, 27",
+      "lat": 36.62,
+      "lng": -4.5
+    },
+    {
+      "name": "IWASH TORROX COSTA",
+      "city": "Torrox Costa",
+      "province": "Málaga",
+      "status": "open",
+      "address": "Av. Esperanto, Local 17. Fase 1",
+      "lat": 36.733,
+      "lng": -3.958
+    },
+    {
+      "name": "IWASH TROBAJO DEL CAMINO",
+      "city": "Trobajo del Camino",
+      "province": "León",
+      "status": "upcoming",
+      "address": "C/ Plaza de las Mestas nº 1",
+      "lat": 42.593,
+      "lng": -5.624
+    },
+    {
+      "name": "IWASH VALLADOLID",
+      "city": "Valladolid",
+      "province": "Valladolid",
+      "status": "upcoming",
+      "address": "Avenida Ramon y Cajal, 8",
+      "lat": 41.6522,
+      "lng": -4.7245
+    },
+    {
+      "name": "IWASH VICÁLVARO",
+      "city": "Madrid",
+      "province": "Madrid",
+      "status": "open",
+      "address": "C. del Lago Van, 25",
+      "lat": 40.4,
+      "lng": -3.6
+    },
+    {
+      "name": "IWASH VILLARUBIA DE LOS OJOS",
+      "city": "Villarrubia de los Ojos",
+      "province": "Ciudad Real",
+      "status": "open",
+      "address": "Av. de la Paz, 18",
+      "lat": 39.22,
+      "lng": -3.6
+    },
+    {
+      "name": "IWASH VISTA FRANCA",
+      "city": "Málaga",
+      "province": "Málaga",
+      "status": "open",
+      "address": "Calle Francisco José, 3",
+      "lat": 36.695,
+      "lng": -4.455
+    },
+    {
+      "name": "IWASH VITORIA",
+      "city": "Vitoria",
+      "province": "Álava",
+      "status": "open",
+      "address": "Calle Pío XII, nº 16, Bajo, Local 02",
+      "lat": 42.8467,
+      "lng": -2.6716
+    },
+    {
+      "name": "IWASH YEPES",
+      "city": "Yepes",
+      "province": "Toledo",
+      "status": "upcoming",
+      "address": "C/ Santa María nº 17",
+      "lat": 39.89,
+      "lng": -3.64
+    },
+    {
+      "name": "IWASH ZARATAN",
+      "city": "Zaratán",
+      "province": "Valladolid",
+      "status": "upcoming",
+      "address": "Camino Plantio 3 E1 PJB C",
+      "lat": 41.664,
+      "lng": -4.778
+    }
+  ]
+}

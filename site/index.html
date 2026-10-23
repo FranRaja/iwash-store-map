@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f5">
+  <title>Lavanderías IWASH | Encuentra tu tienda</title>
+  <meta name="description" content="Localiza lavanderías IWASH abiertas y próximas aperturas en España.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="./styles.css?v=2">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="./app.js?v=2"></script>
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="wordmark" aria-label="IWASH Smart Laundry">IWASH <span>SMART LAUNDRY</span></div>
+      <p class="edition">Red de centros <span aria-hidden="true">/</span> España</p>
+    </header>
+    <section class="intro" aria-labelledby="pageTitle">
+      <h1 id="pageTitle">Encuentra tu lavandería.</h1>
+      <p>Tiendas abiertas y próximas aperturas en España.</p>
+    </section>
+    <div class="workspace">
+      <aside class="directory" aria-label="Directorio de tiendas">
+        <div class="directory-tools">
+          <h2>Tiendas IWASH</h2>
+          <label class="search-label" for="searchInput">Buscar por ciudad, tienda o provincia</label>
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <input id="searchInput" type="search" placeholder="¿Dónde quieres lavar?" autocomplete="off" disabled>
+          </div>
+          <div class="filters" role="group" aria-label="Filtrar tiendas por estado">
+            <button type="button" data-filter="all" aria-pressed="true" disabled>Todas</button>
+            <button type="button" data-filter="open" aria-pressed="false" disabled>Abiertas</button>
+            <button type="button" data-filter="upcoming" aria-pressed="false" disabled>Próximas</button>
+          </div>
+          <div class="results-line">
+            <p id="resultCount" aria-live="polite">Cargando tiendas…</p>
+            <button id="clearSearch" class="text-button" type="button" hidden>Borrar búsqueda</button>
+          </div>
+        </div>
+        <div id="storeList" class="store-list" aria-busy="true">
+          <div class="skeleton" aria-hidden="true"><span></span><span></span></div>
+          <div class="skeleton" aria-hidden="true"><span></span><span></span></div>
+          <div class="skeleton" aria-hidden="true"><span></span><span></span></div>
+        </div>
+      </aside>
+      <section class="map-panel" aria-label="Mapa de tiendas IWASH">
+        <div class="map-toolbar">
+          <span class="map-hint">Selecciona un punto para ver la tienda</span>
+          <button id="resetView" class="map-reset" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/><circle cx="12" cy="12" r="3"/></svg>
+            Ver toda la red
+          </button>
+        </div>
+        <div id="map" aria-label="Mapa interactivo de lavanderías IWASH"></div>
+        <div class="map-summary" aria-label="Resumen de aperturas">
+          <div class="legend">
+            <span><i class="legend-dot" aria-hidden="true"></i><strong id="openCount">—</strong> abiertas</span>
+            <span><i class="legend-dot upcoming" aria-hidden="true"></i><strong id="upcomingCount">—</strong> próximas aperturas</span>
+          </div>
+          <p id="mapNote"></p>
+        </div>
+      </section>
+    </div>
+    <div class="load-message">
+      <p id="loadStatus" class="load-status" role="status" aria-live="polite"></p>
+      <button id="retryLoad" class="text-button" type="button" hidden>Volver a cargar</button>
+    </div>
+  </main>
+</body>
+</html>

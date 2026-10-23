@@ -1,0 +1,65 @@
+name: Publicar mapa IWASH
+
+on:
+  schedule:
+    - cron: "17 9 1 * *"
+      timezone: Europe/Madrid
+  workflow_dispatch:
+    inputs:
+      sync_odoo:
+        description: Actualizar los datos desde Odoo (desactivar solo para publicar la captura inicial revisada)
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v7
+
+      - name: Preparar Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Leer Odoo y preparar el mapa
+        if: github.event_name != 'workflow_dispatch' || inputs.sync_odoo
+        env:
+          ODOO_API_KEY: ${{ secrets.ODOO_API_KEY }}
+          ODOO_URL: https://smart.iwashlaundry.es
+          ODOO_DATABASE: ${{ secrets.ODOO_DATABASE }}
+        run: python scripts/sync_stores.py --output _site/stores.json
+
+      - name: Preparar la captura inicial revisada
+        if: github.event_name == 'workflow_dispatch' && !inputs.sync_odoo
+        run: |
+          mkdir -p _site
+          cp -R site/. _site/
+          cp data/initial-stores.json _site/stores.json
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Publicar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
