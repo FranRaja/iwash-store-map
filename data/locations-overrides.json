@@ -264,9 +264,9 @@
     "city": "Miguel Esteban",
     "province": "Toledo",
     "geocode_status": "unresolved",
-    "geocode_query_hash": "40454e2da4728731c947100080b672eb77ebb8c533ed74ddaf61012172bd2903",
+    "geocode_query_hash": "335a7bcb9659ca5cf94e243ba196c8f0068107cccff358572a629d035d603407",
     "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
-    "geocoded_at": "2026-10-26T10:20:06+00:00"
+    "geocoded_at": "2026-10-26T10:23:40+00:00"
   },
   {
     "name": "IWASH MOLLET DEL VALLES",
@@ -384,10 +384,13 @@
     "name": "IWASH SAN SEBASTIAN",
     "city": "San Sebastián",
     "province": "Guipúzcoa",
-    "geocode_status": "unresolved",
-    "geocode_query_hash": "1d485b49fbf87122cc61989cc36cba1c82c61df4091b79147ef7a2bb7b8c5260",
-    "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
-    "geocoded_at": "2026-10-26T10:19:57+00:00"
+    "lat": 43.324532375487564,
+    "lng": -1.9694006707496892,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "portal-exacto",
+    "matched_address": "HI NAVARRA 24, Donostia/San Sebastián",
+    "geocode_query_hash": "e1b88d57d7fb2ec1f307b3ce7a5931079a9850d9bbea18538710cc5baa014aa0",
+    "geocoded_at": "2026-10-26T10:23:36+00:00"
   },
   {
     "name": "IWASH Sant Pere de Riudebitlles",
