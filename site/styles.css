@@ -113,6 +113,8 @@ button:disabled { cursor: default; }
 .load-status { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .load-status:empty { margin: 0; }
 .load-status.error { color: #9b382d; }
+.source-credit { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.source-credit a { color: inherit; text-underline-offset: 2px; }
 @media (min-width: 1600px) { .directory, .map-panel { height: 700px; } }
 @media (max-width: 1100px) {
   body { padding: 20px; }
@@ -155,3 +157,4 @@ button:disabled { cursor: default; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
