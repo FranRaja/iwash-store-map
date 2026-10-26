@@ -20,7 +20,7 @@ Este repositorio contiene la página estática del mapa, el generador de datos d
 4. No guardar la clave en el repositorio, en un archivo, en la URL de Odoo ni en registros.
 5. Ejecutar el flujo manualmente con `sync_odoo` activado y comprobar el despliegue. Para la publicación inicial antes de disponer de clave, desactivarlo de forma expresa; los datos conservarán la fecha de la captura revisada.
 6. Sustituir una sola vez el iframe de la página de lavanderías de Odoo para que apunte a la URL de GitHub Pages.
-7. Para recibir un informe por correo en cada ejecución, crear los secretos `MAP_NOTIFICATION_TO`, `MAP_SMTP_USER` y `MAP_SMTP_PASSWORD` en Settings → Secrets and variables → Actions. El primero es el buzón destinatario; el segundo, la cuenta de Google remitente; el tercero, su contraseña de aplicación. No introducir estos valores en el repositorio ni en archivos locales.
+7. Para recibir un informe por correo en cada ejecución, crear los secretos `MAP_NOTIFICATION_TO`, `MAP_SMTP_USER` y `MAP_SMTP_PASSWORD` en Settings → Secrets and variables → Actions. El primero es el buzón o los buzones destinatarios (separados por comas); el segundo, la cuenta de Google remitente; el tercero, su contraseña de aplicación. No introducir estos valores en el repositorio ni en archivos locales.
 8. Después de guardar los secretos, ejecutar manualmente el flujo con `sync_odoo` activado y comprobar el correo recibido. La primera ejecución mensual está programada para el día 1 a las 09:17, hora de Madrid.
 
 La URL base por defecto es https://smart.iwashlaundry.es. Si la instancia requiere un nombre de base de datos, añadir ODOO_DATABASE como secreto de Actions.
