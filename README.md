@@ -33,7 +33,7 @@ Odoo no guarda las coordenadas de las 64 tiendas. Los 60 pines que ya aparecen e
 
 La ejecución se cancela si cambia el dominio de la búsqueda guardada, desaparece el filtro, hay un estado ambiguo, se repite un nombre comercial o falta el nombre comercial de una ficha. Así se evita publicar accidentalmente datos fuera del alcance previsto.
 
-Solo se acepta automáticamente un portal que coincida con el código postal, municipio, calle y número de Odoo. Si el resultado es un punto de referencia de un recinto (por ejemplo, un centro comercial o complejo), se añade con ese carácter aproximado y el correo lo marca para revisión. Si no hay coincidencia suficientemente precisa, la tienda sigue sin pin y el motivo aparece en el correo; el intento se guarda para no repetir la consulta mientras la dirección de Odoo no cambie. No se inventan coordenadas.
+Solo se acepta automáticamente un portal que coincida con el código postal, municipio, calle y número de Odoo. Si el resultado es un punto de referencia de un recinto (por ejemplo, un centro comercial o complejo), se añade con ese carácter aproximado y el correo lo marca para revisión. Si no hay coincidencia suficientemente precisa, la tienda sigue sin pin y el motivo aparece en el correo; el intento se conserva y se reintenta cada 90 días o cuando cambie la dirección de Odoo. No se inventan coordenadas.
 
 CartoCiudad es el servicio oficial del IGN-CNIG y permite uso comercial gratuito. El mapa indica su autoría con la licencia CC BY 4.0 SCNE. No se necesita una clave adicional para geocodificar.
 
