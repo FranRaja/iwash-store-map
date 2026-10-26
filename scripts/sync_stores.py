@@ -28,6 +28,7 @@ OPEN_TAG_ID = 12
 UPCOMING_TAG_ID = 31
 TARGET_COMPANY_NAME = "Smart Shops Factory"
 PAGE_SIZE = 100
+GEOCODER_SEARCH_VERSION = "cartociudad-minimal-query-v2"
 
 EXPECTED_FILTER_DOMAIN = [
     "|",
@@ -119,10 +120,10 @@ STOP_WORDS = {"DE", "DEL", "LA", "EL", "LOS", "LAS", "Y", "CENTRO", "COMERCIAL",
 def geocode_address(record: dict[str, Any]) -> str | None:
     street = clean_text(record.get("street"))
     city = display_city(record.get("city"))
-    province = display_province(record.get("state_id"))
-    parts = [street, clean_text(record.get("street2")), clean_text(record.get("zip")), city, province, "España"]
-    query = ", ".join(part for part in parts if part)
-    return query if street and city and len(query) >= 12 else None
+    # CartoCiudad usa q como texto de búsqueda. Los datos administrativos se
+    # envían como filtros separados; añadirlos a q junto con el código postal
+    # puede hacer que una dirección válida devuelva cero candidatos.
+    return street if street and city and len(street) >= 5 else None
 
 
 def address_hash(query: str) -> str:
@@ -230,7 +231,7 @@ def cartociudad_match(
 
 
 def request_cartociudad(query: str, postcode: str | None) -> tuple[list[dict[str, Any]] | None, str | None]:
-    params: dict[str, str] = {"q": query, "limit": "10", "countrycodes": "es"}
+    params: dict[str, str] = {"q": query, "limit": "33", "countrycodes": "es"}
     if postcode:
         params["cod_postal_filter"] = postcode
     url = "https://www.cartociudad.es/geocoder/api/geocoder/candidates?" + urllib.parse.urlencode(params)
@@ -253,22 +254,41 @@ def request_cartociudad(query: str, postcode: str | None) -> tuple[list[dict[str
 
 
 def geocode_queries(record: dict[str, Any], base_query: str) -> list[str]:
-    queries = [base_query]
+    queries: list[str] = []
+
+    def add_query(value: str | None) -> None:
+        cleaned = clean_text(value)
+        if cleaned and cleaned not in queries:
+            queries.append(cleaned)
+
+    add_query(base_query)
     street = clean_text(record.get("street")) or ""
-    city = display_city(record.get("city")) or ""
     province = display_province(record.get("state_id")) or ""
-    postcode = clean_text(record.get("zip")) or ""
+    # Si la ficha indica S/N o un cruce, probar también solo la vía. El texto
+    # de referencia del cruce no debe impedir que el geocoder encuentre la calle.
+    street_only = re.split(r"\b(?:S\s*/\s*N|SIN\s+NUMERO|CRUCE|ESQUINA)\b", street, flags=re.IGNORECASE)[0]
+    add_query(street_only)
+
     # En Donostia el callejero oficial usa la forma vasca "HI NAVARRA".
     if "GIPUZKOA" in normalize_key(province) or "GIPUZCOA" in normalize_key(province):
         avenue = re.match(r"\s*AVENIDA\s+DE\s+(.+?)\s+(\d+[A-Za-z]?)\s*$", street, flags=re.IGNORECASE)
         if avenue:
-            queries.append("HI " + avenue.group(1) + " " + avenue.group(2) + ", " + postcode + ", " + city + ", " + province)
-    simpler = ", ".join(part for part in (street, postcode, city, province) if part)
-    if simpler and simpler not in queries:
-        queries.append(simpler)
+            add_query("HI " + avenue.group(1) + " " + avenue.group(2))
+
+    # La segunda línea puede identificar un recinto conocido. Se consulta su
+    # nombre aparte; cartociudad_match solo lo acepta si coincide con street2.
+    street2 = clean_text(record.get("street2")) or ""
+    facility_words = [
+        word for word in re.findall(r"[^\W_]+", street2, flags=re.UNICODE)
+        if normalize_key(word) not in {
+            "CENTRO", "COMERCIAL", "MODULO", "LOCAL", "ESCALERA", "PLANTA",
+            "BAJO", "PISO", "OFICINA", "NAVE", "PUERTA", "PORTAL", "BLOQUE",
+        }
+        and not any(char.isdigit() for char in word)
+    ]
+    if facility_words:
+        add_query(" ".join(facility_words))
     return queries
-
-
 def save_locations(path: Path, locations: dict[str, dict[str, Any]]) -> None:
     payload = sorted(locations.values(), key=lambda item: normalize_key(item["name"]))
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -303,7 +323,7 @@ def geocode_missing_locations(
     attempted = 0
     for record, key, query in candidates:
         name = clean_text(record.get(COMMERCIAL_NAME_FIELD)) or "Tienda sin nombre"
-        digest = address_hash("\n".join(geocode_queries(record, query)))
+        digest = address_hash(GEOCODER_SEARCH_VERSION + "\n" + "\n".join(geocode_queries(record, query)))
         cached = locations.get(key, {})
         if cached.get("geocode_status") == "unresolved" and cached.get("geocode_query_hash") == digest:
             try:
@@ -336,7 +356,7 @@ def geocode_missing_locations(
             print("GEOCODING_WARNING: " + warning)
             continue
         if not pair:
-            reason = "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados"
+            reason = "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección"
             locations[key] = {
                 "name": name,
                 "city": display_city(record.get("city")),
