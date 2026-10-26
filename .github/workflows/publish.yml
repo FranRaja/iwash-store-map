@@ -38,19 +38,44 @@ jobs:
           python-version: "3.13"
 
       - name: Leer Odoo y preparar el mapa
+        id: sync
         if: github.event_name != 'workflow_dispatch' || inputs.sync_odoo
+        continue-on-error: true
         env:
           ODOO_API_KEY: ${{ secrets.ODOO_API_KEY }}
           ODOO_URL: https://smart.iwashlaundry.es
           ODOO_DATABASE: ${{ secrets.ODOO_DATABASE }}
-        run: python scripts/sync_stores.py --output _site/stores.json
+        run: |
+          set -o pipefail
+          python scripts/sync_stores.py --output _site/stores.json 2>&1 | tee sync.log
 
       - name: Preparar la captura inicial revisada
+        id: snapshot
         if: github.event_name == 'workflow_dispatch' && !inputs.sync_odoo
         run: |
           mkdir -p _site
           cp -R site/. _site/
           cp data/initial-stores.json _site/stores.json
+
+      - name: Preparar el informe de ejecución
+        id: report
+        if: always()
+        env:
+          PREPARATION_STATUS: ${{ steps.sync.outcome == 'success' && 'success' || steps.snapshot.outcome == 'success' && 'snapshot' || 'failure' }}
+          ODOO_API_KEY: ${{ secrets.ODOO_API_KEY }}
+        run: python scripts/create_run_report.py --status "$PREPARATION_STATUS" --sync-log sync.log --output run-report.json
+
+      - name: Guardar el informe para el aviso
+        if: always() && steps.report.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: map-run-report
+          path: run-report.json
+          retention-days: 1
+
+      - name: Detener la ejecución si falló la preparación
+        if: steps.sync.outcome == 'failure' || steps.snapshot.outcome == 'failure'
+        run: exit 1
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
@@ -63,3 +88,33 @@ jobs:
       - name: Publicar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  notify:
+    if: always()
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v7
+
+      - name: Descargar el informe de ejecución
+        uses: actions/download-artifact@v4
+        with:
+          name: map-run-report
+          path: notification
+        continue-on-error: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Enviar el resumen por correo
+        env:
+          MAP_NOTIFICATION_TO: ${{ secrets.MAP_NOTIFICATION_TO }}
+          MAP_SMTP_USER: ${{ secrets.MAP_SMTP_USER }}
+          MAP_SMTP_PASSWORD: ${{ secrets.MAP_SMTP_PASSWORD }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+        run: python scripts/send_notification.py --report notification/run-report.json
+
