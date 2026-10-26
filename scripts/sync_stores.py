@@ -28,7 +28,7 @@ OPEN_TAG_ID = 12
 UPCOMING_TAG_ID = 31
 TARGET_COMPANY_NAME = "Smart Shops Factory"
 PAGE_SIZE = 100
-GEOCODER_SEARCH_VERSION = "cartociudad-minimal-query-v2"
+GEOCODER_SEARCH_VERSION = "cartociudad-minimal-query-v3"
 
 EXPECTED_FILTER_DOMAIN = [
     "|",
@@ -146,7 +146,11 @@ def city_matches(expected: Any, found: Any) -> bool:
 
 
 def province_key(value: Any) -> str:
-    aliases = {"GIPUZCOA": "GIPUZKOA", "CASTELLO": "CASTELLON"}
+    aliases = {
+        "GIPUZCOA": "GIPUZKOA",
+        "GUIPUZCOA": "GIPUZKOA",
+        "CASTELLO": "CASTELLON",
+    }
     return " ".join(aliases.get(word, word) for word in normalize_key(str(value or "")).split())
 
 
@@ -270,7 +274,8 @@ def geocode_queries(record: dict[str, Any], base_query: str) -> list[str]:
     add_query(street_only)
 
     # En Donostia el callejero oficial usa la forma vasca "HI NAVARRA".
-    if "GIPUZKOA" in normalize_key(province) or "GIPUZCOA" in normalize_key(province):
+    normalized_province = normalize_key(province)
+    if any(alias in normalized_province for alias in ("GIPUZKOA", "GIPUZCOA", "GUIPUZCOA")):
         avenue = re.match(r"\s*AVENIDA\s+DE\s+(.+?)\s+(\d+[A-Za-z]?)\s*$", street, flags=re.IGNORECASE)
         if avenue:
             add_query("HI " + avenue.group(1) + " " + avenue.group(2))
