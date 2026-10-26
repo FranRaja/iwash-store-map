@@ -120,18 +120,19 @@ def make_message(report: dict[str, Any], publish_result: str, run_url: str) -> E
     subject_status = "Incidencia" if title.startswith("Incidencia") else "Aviso" if title == "Actualización con avisos" else "Correcta"
 
     recipient = os.environ.get("MAP_NOTIFICATION_TO", "").strip()
+    recipients = [address.strip() for address in recipient.split(",")]
     sender = os.environ.get("MAP_SMTP_USER", "").strip()
     if not recipient or not sender or not os.environ.get("MAP_SMTP_PASSWORD", "").strip():
         raise ValueError("Faltan uno o más secretos MAP_NOTIFICATION_TO, MAP_SMTP_USER o MAP_SMTP_PASSWORD.")
-    if parseaddr(recipient)[1] != recipient or "\n" in recipient or "\r" in recipient:
-        raise ValueError("El secreto MAP_NOTIFICATION_TO no contiene una dirección de correo válida.")
+    if any(not address or parseaddr(address)[1] != address or "\n" in address or "\r" in address for address in recipients):
+        raise ValueError("El secreto MAP_NOTIFICATION_TO debe contener direcciones válidas separadas por comas.")
     if parseaddr(sender)[1] != sender or "\n" in sender or "\r" in sender:
         raise ValueError("El secreto MAP_SMTP_USER no contiene una dirección de correo válida.")
 
     message = EmailMessage()
     message["Subject"] = "[Mapa IWASH] " + subject_status + " — " + title
     message["From"] = sender
-    message["To"] = recipient
+    message["To"] = ", ".join(recipients)
     message.set_content("\n".join(lines))
     return message
 
