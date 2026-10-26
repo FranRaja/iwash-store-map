@@ -27,17 +27,19 @@ La URL base por defecto es https://smart.iwashlaundry.es. Si la instancia requie
 
 ## Datos publicados
 
-La consulta lee el filtro guardado Aperturas Iwash (id 25), el nombre comercial, ciudad, provincia, estado y coordenadas. Incluye registros activos de Smart Shops Factory y registros activos sin compañía. Los datos públicos no incluyen identificadores internos, nombres personales, correos, teléfonos, nombres de compañías vinculadas ni coordenadas 0,0.
+La consulta lee el filtro guardado Aperturas Iwash (id 25), el nombre comercial, ciudad, provincia, estado, dirección postal y coordenadas. Incluye registros activos de Smart Shops Factory y registros activos sin compañía. Los datos públicos no incluyen identificadores internos, nombres personales, correos, teléfonos, nombres de compañías vinculadas ni coordenadas 0,0.
 
-El generador conserva la dirección y las coordenadas publicadas actualmente para las 60 tiendas que coinciden con el filtro. Los comercios nuevos aparecen sin marcador hasta que tengan coordenadas Odoo válidas. No se publica su calle hasta incorporarla a la lista de ubicaciones verificadas.
+El generador conserva las coordenadas ya publicadas en `data/locations-overrides.json`. Si una tienda no tiene coordenadas en Odoo, consulta CartoCiudad (IGN-CNIG) con la calle, el código postal y la localidad. Guarda automáticamente los resultados aceptados en ese mismo archivo y los incorpora al mapa de esa ejecución. La acción no escribe coordenadas en Odoo.
 
 La ejecución se cancela si cambia el dominio de la búsqueda guardada, desaparece el filtro, hay un estado ambiguo, se repite un nombre comercial o falta el nombre comercial de una ficha. Así se evita publicar accidentalmente datos fuera del alcance previsto.
 
-Una ficha puede tener calle en Odoo y seguir sin pin si latitud y longitud están a 0,0. El sincronizador actual no lee los campos street/street2 ni geocodifica; para añadir el pin hay que validar y guardar coordenadas en Odoo o en data/locations-overrides.json. No se deben inventar coordenadas.
+Solo se acepta automáticamente un portal que coincida con el código postal, municipio, calle y número de Odoo. Si el resultado es un punto de referencia de un recinto (por ejemplo, un centro comercial o complejo), se añade con ese carácter aproximado y el correo lo marca para revisión. Si no hay coincidencia suficientemente precisa, la tienda sigue sin pin y el motivo aparece en el correo; el intento se guarda para no repetir la consulta mientras la dirección de Odoo no cambie. No se inventan coordenadas.
+
+CartoCiudad es el servicio oficial del IGN-CNIG y permite uso comercial gratuito. El mapa indica su autoría con la licencia CC BY 4.0 SCNE. No se necesita una clave adicional para geocodificar.
 
 ## Avisos por correo
 
-Después de cada ejecución mensual o manual, el flujo envía un correo con el resultado, los recuentos de tiendas y marcadores, las fichas añadidas, retiradas o modificadas, las fichas sin coordenadas y el enlace al registro de GitHub Actions. Si falla la lectura de Odoo, se informa del error y se conserva la publicación anterior; el listado de coordenadas ausentes se toma de esa última versión cuando está disponible. Los avisos salen incluso si falla la publicación.
+Después de cada ejecución mensual o manual, el flujo envía un correo con el resultado, los recuentos de tiendas y marcadores, los pines añadidos por geocodificación, las fichas añadidas, retiradas o modificadas, las direcciones pendientes o aproximadas y el enlace al registro de GitHub Actions. Si falla la lectura de Odoo, se informa del error y se conserva la publicación anterior; el listado de coordenadas ausentes se toma de esa última versión cuando está disponible. Los avisos salen incluso si falla la publicación.
 
 El correo requiere los secretos `MAP_NOTIFICATION_TO`, `MAP_SMTP_USER` y `MAP_SMTP_PASSWORD`. El remitente usa SMTP SSL de Gmail (`smtp.gmail.com:465`); `MAP_SMTP_PASSWORD` debe ser una contraseña de aplicación permitida por la cuenta. No guardar claves en el repositorio, los logs o archivos. Si el correo no se puede enviar, el trabajo `notify` falla en Actions; el despliegue puede haberse completado antes de ese fallo.
 
@@ -50,7 +52,7 @@ La API externa JSON-2 de Odoo 19 requiere una clave Bearer. Odoo limita a tres m
 ## Archivos
 
 - site/: interfaz del mapa.
-- data/locations-overrides.json: ubicaciones ya verificadas y publicadas.
+- data/locations-overrides.json: coordenadas conservadas, resultados aceptados y direcciones pendientes de geocodificación.
 - data/initial-stores.json: captura pública mínima revisada del 23/10/2026 para la primera publicación manual.
 - scripts/sync_stores.py: consulta Odoo, filtra y prepara la lista pública.
 - .github/workflows/publish.yml: publicación mensual y manual.
