@@ -41,7 +41,10 @@ def section(title: str, values: list[str], empty: str) -> list[str]:
 def make_message(report: dict[str, Any], publish_result: str, run_url: str) -> EmailMessage:
     data_status = report.get("data_status", "failure")
     job_succeeded = publish_result == "success"
-    if not job_succeeded or data_status == "failure":
+    if not job_succeeded and data_status == "success":
+        title = "Incidencia en la publicación"
+        result_text = "La sincronización preparó los datos, pero GitHub no confirmó la publicación. Los recuentos y cambios de este correo corresponden a los datos preparados en esta ejecución; consulta el registro de GitHub Actions."
+    elif not job_succeeded or data_status == "failure":
         title = "Incidencia en la actualización"
         result_text = "No se completó la ejecución correctamente. Si falló la lectura de Odoo, se conserva el mapa anterior. Consulta el registro de GitHub Actions para identificar el paso fallido."
     elif data_status == "snapshot":
