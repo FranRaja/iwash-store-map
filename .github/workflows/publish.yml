@@ -13,7 +13,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -49,6 +49,20 @@ jobs:
           set -o pipefail
           python scripts/sync_stores.py --output _site/stores.json 2>&1 | tee sync.log
 
+      - name: Guardar las coordenadas resueltas
+        id: save_locations
+        if: steps.sync.outcome == 'success'
+        run: |
+          if git diff --quiet -- data/locations-overrides.json; then
+            echo "No hay coordenadas nuevas que guardar."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/locations-overrides.json
+          git commit -m "Actualizar coordenadas de tiendas" || { echo "No se publicó el mapa: no se pudo preparar el guardado de ubicaciones." | tee -a sync.log; exit 1; }
+          git push || { echo "No se publicó el mapa: GitHub rechazó el guardado de ubicaciones." | tee -a sync.log; exit 1; }
+
       - name: Preparar la captura inicial revisada
         id: snapshot
         if: github.event_name == 'workflow_dispatch' && !inputs.sync_odoo
@@ -61,7 +75,7 @@ jobs:
         id: report
         if: always()
         env:
-          PREPARATION_STATUS: ${{ steps.sync.outcome == 'success' && 'success' || steps.snapshot.outcome == 'success' && 'snapshot' || 'failure' }}
+          PREPARATION_STATUS: ${{ steps.sync.outcome == 'success' && steps.save_locations.outcome != 'failure' && 'success' || steps.snapshot.outcome == 'success' && 'snapshot' || 'failure' }}
           ODOO_API_KEY: ${{ secrets.ODOO_API_KEY }}
         run: python scripts/create_run_report.py --status "$PREPARATION_STATUS" --sync-log sync.log --output run-report.json
 
@@ -74,7 +88,7 @@ jobs:
           retention-days: 1
 
       - name: Detener la ejecución si falló la preparación
-        if: steps.sync.outcome == 'failure' || steps.snapshot.outcome == 'failure'
+        if: steps.sync.outcome == 'failure' || steps.save_locations.outcome == 'failure' || steps.snapshot.outcome == 'failure'
         run: exit 1
 
       - name: Configurar GitHub Pages
