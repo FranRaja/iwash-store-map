@@ -95,6 +95,14 @@ def read_sync_error(path: Path) -> str | None:
     return diagnostic[:1200]
 
 
+def read_log_entries(path: Path, prefix: str) -> list[str]:
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    return [line.split(prefix, 1)[1].strip() for line in lines if prefix in line]
+
+
 def build_report(status: str, sync_log: Path) -> dict[str, Any]:
     current = read_store_list(ROOT / "_site" / "stores.json") if status in ("success", "snapshot") else None
     previous = fetch_published_stores()
@@ -151,6 +159,8 @@ def build_report(status: str, sync_log: Path) -> dict[str, Any]:
         "removed": removed,
         "changed": changed,
         "missing_coordinates": missing_coordinates,
+        "geocoded": read_log_entries(sync_log, "GEOCODED:"),
+        "geocoding_warnings": read_log_entries(sync_log, "GEOCODING_WARNING:"),
         "sync_error": sync_error,
     }
 
