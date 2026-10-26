@@ -289,6 +289,8 @@ def geocode_queries(record: dict[str, Any], base_query: str) -> list[str]:
     if facility_words:
         add_query(" ".join(facility_words))
     return queries
+
+
 def save_locations(path: Path, locations: dict[str, dict[str, Any]]) -> None:
     payload = sorted(locations.values(), key=lambda item: normalize_key(item["name"]))
     temporary = path.with_suffix(path.suffix + ".tmp")
