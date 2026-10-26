@@ -3,15 +3,18 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import hashlib
 import math
 import os
+import re
 import shutil
 import sys
+import time
 import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +40,9 @@ EXPECTED_FILTER_DOMAIN = [
 PARTNER_FIELDS = [
     COMMERCIAL_NAME_FIELD,
     "city",
+    "street",
+    "street2",
+    "zip",
     "state_id",
     "partner_latitude",
     "partner_longitude",
@@ -100,6 +106,275 @@ def coordinate_pair(latitude: Any, longitude: Any) -> tuple[float, float] | None
     if not (27 <= lat <= 45.5 and -18 <= lng <= 5):
         return None
     return lat, lng
+
+
+ROAD_WORDS = {
+    "CALLE", "C", "CL", "AVENIDA", "AVDA", "AV", "CARRETERA", "CTRA",
+    "PLAZA", "PZA", "PASEO", "PSO", "CAMINO", "CMNO", "TRAVESIA", "TRVA",
+    "RONDA", "GLORIETA", "CRUCE", "ESQUINA", "S", "N", "SN", "HI",
+}
+STOP_WORDS = {"DE", "DEL", "LA", "EL", "LOS", "LAS", "Y", "CENTRO", "COMERCIAL", "MODULO"}
+
+
+def geocode_address(record: dict[str, Any]) -> str | None:
+    street = clean_text(record.get("street"))
+    city = display_city(record.get("city"))
+    province = display_province(record.get("state_id"))
+    parts = [street, clean_text(record.get("street2")), clean_text(record.get("zip")), city, province, "España"]
+    query = ", ".join(part for part in parts if part)
+    return query if street and city and len(query) >= 12 else None
+
+
+def address_hash(query: str) -> str:
+    return hashlib.sha256(normalize_key(query).encode("utf-8")).hexdigest()
+
+
+def address_tokens(value: Any) -> set[str]:
+    words = set(normalize_key(str(value or "")).split())
+    return words - ROAD_WORDS - STOP_WORDS
+
+
+def city_matches(expected: Any, found: Any) -> bool:
+    expected_key = normalize_key(str(expected or ""))
+    expected_key = {"SAN JORDI": "SANT JORDI"}.get(expected_key, expected_key)
+    expected_words = set(expected_key.split())
+    found_words = set(normalize_key(str(found or "")).split())
+    if not expected_words or not found_words:
+        return False
+    return expected_words <= found_words or found_words <= expected_words
+
+
+def province_key(value: Any) -> str:
+    aliases = {"GIPUZCOA": "GIPUZKOA", "CASTELLO": "CASTELLON"}
+    return " ".join(aliases.get(word, word) for word in normalize_key(str(value or "")).split())
+
+
+def province_matches(expected: Any, found: Any) -> bool:
+    expected_words = set(province_key(expected).split())
+    found_words = set(province_key(found).split())
+    return bool(expected_words and found_words and (expected_words <= found_words or found_words <= expected_words))
+
+
+def expected_street(record: dict[str, Any]) -> tuple[set[str], str | None]:
+    street = clean_text(record.get("street")) or ""
+    is_no_number = bool(re.search(r"\b(?:S\s*/\s*N|SIN\s+NUMERO)\b", street, flags=re.IGNORECASE))
+    # Cruces y referencias posteriores a S/N no identifican el nombre de la vía.
+    street = re.split(r"\b(?:S\s*/\s*N|SIN\s+NUMERO|CRUCE|ESQUINA)\b", street, flags=re.IGNORECASE)[0]
+    house_match = re.search(r"(?:^|[,\s])(?:N[ºO.]?\s*)?(\d+[A-Za-z]?(?:-\d+)?)\s*$", street, flags=re.IGNORECASE)
+    house_number = house_match.group(1) if house_match else ("SN" if is_no_number else None)
+    if house_match:
+        street = street[:house_match.start()].strip(" ,")
+    return address_tokens(street), house_number
+
+
+def candidate_street_tokens(candidate: dict[str, Any]) -> set[str]:
+    address = clean_text(candidate.get("address")) or ""
+    road = address.split(",", 1)[0]
+    words = address_tokens(road)
+    number = candidate.get("portalNumber")
+    if number not in (None, False, ""):
+        words.discard(normalize_key(str(number)))
+    return words
+
+
+def cartociudad_match(
+    record: dict[str, Any], candidates: list[dict[str, Any]],
+) -> tuple[tuple[float, float] | None, str | None, str | None]:
+    postcode = clean_text(record.get("zip"))
+    expected_city = display_city(record.get("city"))
+    expected_province = display_province(record.get("state_id"))
+    expected_road, expected_house = expected_street(record)
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        if postcode and normalize_key(str(candidate.get("postalCode") or "")) != normalize_key(postcode):
+            continue
+        if not city_matches(expected_city, candidate.get("muni")):
+            continue
+        if expected_province and not province_matches(expected_province, candidate.get("province")):
+            continue
+        if candidate.get("countryCode") not in (None, "011", 11):
+            continue
+
+        kind = str(candidate.get("type") or "").lower()
+        match_type: str | None = None
+        if kind == "portal":
+            if candidate_street_tokens(candidate) != expected_road:
+                continue
+            if expected_house == "SN":
+                if candidate.get("noNumber") not in (True, "true", "True", 1):
+                    continue
+                match_type = "portal-sin-numero"
+            elif expected_house:
+                if normalize_key(str(candidate.get("portalNumber") or "")) != normalize_key(expected_house):
+                    continue
+                match_type = "portal-exacto"
+            else:
+                continue
+        elif kind == "toponimo":
+            # Solo se acepta un punto de interés si su nombre aparece literalmente
+            # en la segunda línea de dirección de Odoo; se etiqueta como referencia.
+            place = (clean_text(candidate.get("address")) or "").split(",", 1)[0]
+            place_words = address_tokens(place)
+            street2_words = address_tokens(record.get("street2"))
+            if not place_words or not place_words <= street2_words:
+                continue
+            match_type = "referencia-recinto"
+        else:
+            continue
+
+        pair = coordinate_pair(candidate.get("lat"), candidate.get("lng"))
+        if pair:
+            return pair, match_type, clean_text(candidate.get("address"))
+    return None, None, None
+
+
+def request_cartociudad(query: str, postcode: str | None) -> tuple[list[dict[str, Any]] | None, str | None]:
+    params: dict[str, str] = {"q": query, "limit": "10", "countrycodes": "es"}
+    if postcode:
+        params["cod_postal_filter"] = postcode
+    url = "https://www.cartociudad.es/geocoder/api/geocoder/candidates?" + urllib.parse.urlencode(params)
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "IWASH-Store-Map/1.0 (monthly address matching; contacto: smart.iwashlaundry.es)"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        return None, "CartoCiudad devolvió HTTP " + str(exc.code)
+    except urllib.error.URLError:
+        return None, "no se pudo conectar con CartoCiudad"
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None, "CartoCiudad devolvió una respuesta inválida"
+    if not isinstance(payload, list):
+        return None, "CartoCiudad devolvió un formato inesperado"
+    return [item for item in payload if isinstance(item, dict)], None
+
+
+def geocode_queries(record: dict[str, Any], base_query: str) -> list[str]:
+    queries = [base_query]
+    street = clean_text(record.get("street")) or ""
+    city = display_city(record.get("city")) or ""
+    province = display_province(record.get("state_id")) or ""
+    postcode = clean_text(record.get("zip")) or ""
+    # En Donostia el callejero oficial usa la forma vasca "HI NAVARRA".
+    if "GIPUZKOA" in normalize_key(province) or "GIPUZCOA" in normalize_key(province):
+        avenue = re.match(r"\s*AVENIDA\s+DE\s+(.+?)\s+(\d+[A-Za-z]?)\s*$", street, flags=re.IGNORECASE)
+        if avenue:
+            queries.append("HI " + avenue.group(1) + " " + avenue.group(2) + ", " + postcode + ", " + city + ", " + province)
+    simpler = ", ".join(part for part in (street, postcode, city, province) if part)
+    if simpler and simpler not in queries:
+        queries.append(simpler)
+    return queries
+
+
+def save_locations(path: Path, locations: dict[str, dict[str, Any]]) -> None:
+    payload = sorted(locations.values(), key=lambda item: normalize_key(item["name"]))
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def geocode_missing_locations(
+    partner_records: list[dict[str, Any]],
+    locations: dict[str, dict[str, Any]],
+    locations_path: Path,
+) -> list[str]:
+    candidates: list[tuple[dict[str, Any], str, str]] = []
+    for record in partner_records:
+        name = clean_text(record.get(COMMERCIAL_NAME_FIELD))
+        if not name:
+            continue
+        key = normalize_key(name)
+        if key in locations and coordinate_pair(locations[key].get("lat"), locations[key].get("lng")):
+            continue
+        if coordinate_pair(record.get("partner_latitude"), record.get("partner_longitude")):
+            continue
+        query = geocode_address(record)
+        if query:
+            candidates.append((record, key, query))
+
+    if not candidates:
+        return []
+
+    warnings: list[str] = []
+    updated = False
+    attempted = 0
+    for record, key, query in candidates:
+        name = clean_text(record.get(COMMERCIAL_NAME_FIELD)) or "Tienda sin nombre"
+        digest = address_hash("\n".join(geocode_queries(record, query)))
+        cached = locations.get(key, {})
+        if cached.get("geocode_status") == "unresolved" and cached.get("geocode_query_hash") == digest:
+            try:
+                checked_at = datetime.fromisoformat(str(cached.get("geocoded_at", "")).replace("Z", "+00:00"))
+            except ValueError:
+                checked_at = datetime.min.replace(tzinfo=timezone.utc)
+            if datetime.now(timezone.utc) - checked_at < timedelta(days=90):
+                warning = name + ": " + str(cached.get("geocode_reason") or "coordenadas pendientes de coincidencia fiable")
+                warnings.append(warning)
+                print("GEOCODING_WARNING: " + warning)
+                continue
+
+        pair: tuple[float, float] | None = None
+        match_type: str | None = None
+        matched_address: str | None = None
+        request_error: str | None = None
+        for variant in geocode_queries(record, query):
+            if attempted:
+                time.sleep(1.05)
+            attempted += 1
+            results, request_error = request_cartociudad(variant, clean_text(record.get("zip")))
+            if request_error:
+                break
+            pair, match_type, matched_address = cartociudad_match(record, results or [])
+            if pair:
+                break
+        if request_error:
+            warning = name + ": " + request_error
+            warnings.append(warning)
+            print("GEOCODING_WARNING: " + warning)
+            continue
+        if not pair:
+            reason = "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados"
+            locations[key] = {
+                "name": name,
+                "city": display_city(record.get("city")),
+                "province": display_province(record.get("state_id")),
+                "geocode_status": "unresolved",
+                "geocode_query_hash": digest,
+                "geocode_reason": reason,
+                "geocoded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+            updated = True
+            warning = name + ": " + reason
+            warnings.append(warning)
+            print("GEOCODING_WARNING: " + warning)
+            continue
+
+        lat, lng = pair
+        locations[key] = {
+            "name": name,
+            "city": display_city(record.get("city")),
+            "province": display_province(record.get("state_id")),
+            "lat": lat,
+            "lng": lng,
+            "coordinate_source": "CartoCiudad (IGN-CNIG)",
+            "match_type": match_type,
+            "matched_address": matched_address,
+            "geocode_query_hash": digest,
+            "geocoded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        }
+        updated = True
+        print("GEOCODED: " + name + " (coincidencia " + str(match_type) + "; " + str(matched_address) + ")")
+        if match_type == "referencia-recinto":
+            warning = name + ": pin situado en la referencia del recinto; puede requerir ajuste al módulo/local"
+            warnings.append(warning)
+            print("GEOCODING_WARNING: " + warning)
+
+    if updated:
+        save_locations(locations_path, locations)
+    return warnings
 
 
 def to_json_lists(value: Any) -> Any:
@@ -258,7 +533,8 @@ def read_locations(path: Path) -> dict[str, dict[str, Any]]:
         if not key or key in locations:
             raise SyncError("Hay nombres duplicados en las ubicaciones verificadas.")
         pair = coordinate_pair(item.get("lat"), item.get("lng"))
-        if not pair:
+        unresolved = item.get("geocode_status") == "unresolved" and isinstance(item.get("geocode_query_hash"), str)
+        if not pair and not unresolved:
             raise SyncError("Una ubicación verificada no contiene coordenadas válidas.")
         locations[key] = item
     return locations
@@ -292,17 +568,15 @@ def build_public_stores(
         status = "open" if is_open else "upcoming"
 
         location = locations.get(key)
-        if location:
-            lat, lng = coordinate_pair(location.get("lat"), location.get("lng")) or (None, None)
-            city = clean_text(location.get("city"))
-            province = clean_text(location.get("province"))
-            address = clean_text(location.get("address"))
-        else:
-            pair = coordinate_pair(record.get("partner_latitude"), record.get("partner_longitude"))
-            lat, lng = pair if pair else (None, None)
-            city = display_city(record.get("city"))
-            province = display_province(record.get("state_id"))
-            address = None
+        override_pair = coordinate_pair(location.get("lat"), location.get("lng")) if location else None
+        odoo_pair = coordinate_pair(record.get("partner_latitude"), record.get("partner_longitude"))
+        pair = override_pair or odoo_pair
+        lat, lng = pair if pair else (None, None)
+        city = clean_text(location.get("city")) if location else None
+        province = clean_text(location.get("province")) if location else None
+        city = city or display_city(record.get("city"))
+        province = province or display_province(record.get("state_id"))
+        address = clean_text(location.get("address")) if location else None
 
         if not city and not province:
             raise SyncError("Una tienda no tiene ciudad ni provincia; se detuvo la publicación.")
@@ -374,6 +648,8 @@ def main() -> int:
         company_id = read_company_id()
         partner_records = read_partners(saved_domain, company_id)
 
+    if not args.snapshot:
+        geocode_missing_locations(partner_records, locations, args.locations)
     stores = build_public_stores(partner_records, locations)
     generate_site(stores, args.output, ROOT / "site")
     open_count = sum(1 for item in stores if item["status"] == "open")
@@ -399,3 +675,4 @@ if __name__ == "__main__":
     except SyncError as exc:
         print("No se publicó el mapa: " + str(exc), file=sys.stderr)
         raise SystemExit(1)
+
