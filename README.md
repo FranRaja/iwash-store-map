@@ -29,7 +29,7 @@ La URL base por defecto es https://smart.iwashlaundry.es. Si la instancia requie
 
 La consulta lee el filtro guardado Aperturas Iwash (id 25), el nombre comercial, ciudad, provincia, estado, dirección postal y coordenadas. Incluye registros activos de Smart Shops Factory y registros activos sin compañía. Los datos públicos no incluyen identificadores internos, nombres personales, correos, teléfonos, nombres de compañías vinculadas ni coordenadas 0,0.
 
-El generador conserva las coordenadas ya publicadas en `data/locations-overrides.json`. Si una tienda no tiene coordenadas en Odoo, consulta CartoCiudad (IGN-CNIG) con la calle, el código postal y la localidad. Guarda automáticamente los resultados aceptados en ese mismo archivo y los incorpora al mapa de esa ejecución. La acción no escribe coordenadas en Odoo.
+Odoo no guarda las coordenadas de las 64 tiendas. Los 60 pines que ya aparecen en el mapa se conservan en `data/locations-overrides.json`. Para tiendas nuevas que no tengan entrada en ese archivo, el flujo consulta CartoCiudad (IGN-CNIG) con la calle, el código postal y la localidad; guarda automáticamente los resultados aceptados en el mismo archivo y los incorpora al mapa de esa ejecución. La acción no escribe coordenadas en Odoo.
 
 La ejecución se cancela si cambia el dominio de la búsqueda guardada, desaparece el filtro, hay un estado ambiguo, se repite un nombre comercial o falta el nombre comercial de una ficha. Así se evita publicar accidentalmente datos fuera del alcance previsto.
 
