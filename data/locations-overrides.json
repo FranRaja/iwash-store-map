@@ -83,10 +83,13 @@
     "name": "IWASH CASTELLÓN",
     "city": "San Jordi",
     "province": "Castellón",
-    "geocode_status": "unresolved",
-    "geocode_query_hash": "2f6c36aeed24808036a17ef33356f2af77eb97e70dc31e0b61ab3851120bc128",
-    "geocode_reason": "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados",
-    "geocoded_at": "2026-10-26T10:01:34+00:00"
+    "lat": 40.54985006764521,
+    "lng": 0.3645883572477273,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "referencia-recinto",
+    "matched_address": "Panorámica Golf, Urbanización Panorámica (Sant Jordi/San Jorge)",
+    "geocode_query_hash": "41a9171506ba1993303d590021574011a5421ca565179d5b61f2a5a0ece03e41",
+    "geocoded_at": "2026-10-26T10:20:03+00:00"
   },
   {
     "name": "IWASH CC COLOMBIA",
@@ -261,9 +264,9 @@
     "city": "Miguel Esteban",
     "province": "Toledo",
     "geocode_status": "unresolved",
-    "geocode_query_hash": "4a65ef0528ea1a829ab610bac24741891bad48638ec97a100f8691912b7adfa9",
-    "geocode_reason": "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados",
-    "geocoded_at": "2026-10-26T10:01:39+00:00"
+    "geocode_query_hash": "40454e2da4728731c947100080b672eb77ebb8c533ed74ddaf61012172bd2903",
+    "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
+    "geocoded_at": "2026-10-26T10:20:06+00:00"
   },
   {
     "name": "IWASH MOLLET DEL VALLES",
@@ -382,9 +385,9 @@
     "city": "San Sebastián",
     "province": "Guipúzcoa",
     "geocode_status": "unresolved",
-    "geocode_query_hash": "a1f2987eddd35eaf9dfcf72d8408a0c6527eeca0c12cdb43bd8dc2ce05d4e103",
-    "geocode_reason": "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados",
-    "geocoded_at": "2026-10-26T10:01:24+00:00"
+    "geocode_query_hash": "1d485b49fbf87122cc61989cc36cba1c82c61df4091b79147ef7a2bb7b8c5260",
+    "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
+    "geocoded_at": "2026-10-26T10:19:57+00:00"
   },
   {
     "name": "IWASH Sant Pere de Riudebitlles",
@@ -406,10 +409,13 @@
     "name": "IWASH SEGOVIA",
     "city": "Segovia",
     "province": "Segovia",
-    "geocode_status": "unresolved",
-    "geocode_query_hash": "de1c7313fc7a41e8447f82487097ddc7ca92d0f3a8d3b03df2c680c283790e8c",
-    "geocode_reason": "CartoCiudad no encontró un portal exacto con el código postal y la localidad indicados",
-    "geocoded_at": "2026-10-26T10:01:29+00:00"
+    "lat": 40.94914144810995,
+    "lng": -4.122995874740874,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "portal-exacto",
+    "matched_address": "CALLE JUAN BRAVO 6, Segovia",
+    "geocode_query_hash": "3173dfb1bf856d59b8b132bf42e5f7b2ee1617817e5bb950a9e1d6601538ba5e",
+    "geocoded_at": "2026-10-26T10:19:59+00:00"
   },
   {
     "name": "IWASH SOHO",
