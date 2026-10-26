@@ -54,6 +54,11 @@ def make_message(report: dict[str, Any], publish_result: str, run_url: str) -> E
         title = "Actualización completada"
         result_text = "La sincronización con Odoo y la publicación del mapa terminaron correctamente."
 
+    geocoding_warnings = report.get("geocoding_warnings", [])
+    if job_succeeded and data_status == "success" and geocoding_warnings:
+        title = "Actualización con avisos"
+        result_text = "El mapa se publicó, pero algunas direcciones necesitan revisión para añadir su pin."
+
     lines = [
         "Mapa público de tiendas IWASH",
         "",
@@ -80,6 +85,13 @@ def make_message(report: dict[str, Any], publish_result: str, run_url: str) -> E
     elif data_status == "failure":
         lines.extend(["", "Cambios: no se pudieron calcular porque la lectura o preparación de Odoo falló."])
 
+    if data_status == "success":
+        lines.extend([""])
+        lines.extend(section("Pines añadidos automáticamente", report.get("geocoded", []), "Ninguno en esta ejecución."))
+        if geocoding_warnings:
+            lines.extend([""])
+            lines.extend(section("Avisos de coordenadas", geocoding_warnings, "Ninguno."))
+
     lines.extend([""])
     if report.get("missing_coordinates"):
         lines.extend(section("Fichas sin coordenadas", report["missing_coordinates"], "Ninguna."))
@@ -105,7 +117,7 @@ def make_message(report: dict[str, Any], publish_result: str, run_url: str) -> E
         except ValueError:
             pass
     lines.extend(["", "Ejecución de GitHub Actions:", run_url])
-    subject_status = "Incidencia" if title.startswith("Incidencia") else "Correcta"
+    subject_status = "Incidencia" if title.startswith("Incidencia") else "Aviso" if title == "Actualización con avisos" else "Correcta"
 
     recipient = os.environ.get("MAP_NOTIFICATION_TO", "").strip()
     sender = os.environ.get("MAP_SMTP_USER", "").strip()
