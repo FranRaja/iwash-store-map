@@ -28,7 +28,7 @@ OPEN_TAG_ID = 12
 UPCOMING_TAG_ID = 31
 TARGET_COMPANY_NAME = "Smart Shops Factory"
 PAGE_SIZE = 100
-GEOCODER_SEARCH_VERSION = "cartociudad-minimal-query-v3"
+GEOCODER_SEARCH_VERSION = "cartociudad-current-address-v4"
 
 EXPECTED_FILTER_DOMAIN = [
     "|",
@@ -75,6 +75,11 @@ def display_city(value: Any) -> str | None:
         return None
     if city.isupper():
         return city.title()
+
+
+def display_address(record: dict[str, Any]) -> str | None:
+    parts = [clean_text(record.get("street")), clean_text(record.get("street2"))]
+    return ", ".join(part for part in parts if part) or None
     return city
 
 
@@ -112,7 +117,7 @@ def coordinate_pair(latitude: Any, longitude: Any) -> tuple[float, float] | None
 ROAD_WORDS = {
     "CALLE", "C", "CL", "AVENIDA", "AVDA", "AV", "CARRETERA", "CTRA",
     "PLAZA", "PZA", "PASEO", "PSO", "CAMINO", "CMNO", "TRAVESIA", "TRVA",
-    "RONDA", "GLORIETA", "CRUCE", "ESQUINA", "S", "N", "SN", "HI",
+    "RONDA", "GLORIETA", "CRUCE", "ESQUINA", "CARRER", "S", "N", "SN", "HI",
 }
 STOP_WORDS = {"DE", "DEL", "LA", "EL", "LOS", "LAS", "Y", "CENTRO", "COMERCIAL", "MODULO"}
 
@@ -133,6 +138,39 @@ def address_hash(query: str) -> str:
 def address_tokens(value: Any) -> set[str]:
     words = set(normalize_key(str(value or "")).split())
     return words - ROAD_WORDS - STOP_WORDS
+
+
+def address_signature(value: Any) -> tuple[frozenset[str], str | None] | None:
+    cleaned = clean_text(value)
+    if not cleaned:
+        return None
+    # Keep the road and portal while excluding optional locality/postcode text
+    # sometimes entered after the address in Odoo.
+    core = ", ".join(cleaned.split(",")[:2])
+    normalized = normalize_key(core)
+    number_match = re.search(r"\d+", normalized)
+    if number_match:
+        road = normalized[:number_match.start()]
+        number = number_match.group(0)
+    else:
+        road = normalized
+        number = "SN" if re.search(r"\b(?:S\s+N|SIN\s+NUMERO|SN)\b", normalized) else None
+    road_words = road.split()
+    if road_words and road_words[0] in ROAD_WORDS:
+        road_words = road_words[1:]
+    tokens = set(road_words) - STOP_WORDS
+    return (frozenset(tokens), number) if tokens else None
+
+
+def location_matches_address(record: dict[str, Any], location: dict[str, Any], digest: str) -> bool:
+    saved_hash = clean_text(location.get("geocode_query_hash"))
+    if saved_hash:
+        return saved_hash == digest
+    saved_address = clean_text(location.get("address")) or clean_text(location.get("matched_address"))
+    current_address = clean_text(record.get("street"))
+    current_signature = address_signature(current_address)
+    saved_signature = address_signature(saved_address)
+    return bool(current_signature and saved_signature and current_signature == saved_signature)
 
 
 def city_matches(expected: Any, found: Any) -> bool:
@@ -273,6 +311,16 @@ def geocode_queries(record: dict[str, Any], base_query: str) -> list[str]:
     street_only = re.split(r"\b(?:S\s*/\s*N|SIN\s+NUMERO|CRUCE|ESQUINA)\b", street, flags=re.IGNORECASE)[0]
     add_query(street_only)
 
+    # CartoCiudad sometimes indexes a Catalan street without its leading type
+    # (for example, "Carrer la Carretera 48" as "Avenida Carretera La 48").
+    street_without_type = re.sub(
+        r"^\s*(?:CARRER|CALLE|C\s*/|C\.?|CL\.?|AVENIDA|AVDA\.?|AV\.?|PLAZA|PZA\.?)\s*",
+        "",
+        street_only,
+        flags=re.IGNORECASE,
+    )
+    add_query(re.sub(r"[,]+", " ", street_without_type))
+
     # En Donostia el callejero oficial usa la forma vasca "HI NAVARRA".
     normalized_province = normalize_key(province)
     if any(alias in normalized_province for alias in ("GIPUZKOA", "GIPUZCOA", "GUIPUZCOA")):
@@ -308,19 +356,22 @@ def geocode_missing_locations(
     locations: dict[str, dict[str, Any]],
     locations_path: Path,
 ) -> list[str]:
-    candidates: list[tuple[dict[str, Any], str, str]] = []
+    candidates: list[tuple[dict[str, Any], str, str, str]] = []
     for record in partner_records:
         name = clean_text(record.get(COMMERCIAL_NAME_FIELD))
         if not name:
             continue
         key = normalize_key(name)
-        if key in locations and coordinate_pair(locations[key].get("lat"), locations[key].get("lng")):
-            continue
         if coordinate_pair(record.get("partner_latitude"), record.get("partner_longitude")):
             continue
         query = geocode_address(record)
-        if query:
-            candidates.append((record, key, query))
+        if not query:
+            continue
+        digest = address_hash(GEOCODER_SEARCH_VERSION + "\n" + "\n".join(geocode_queries(record, query)))
+        location = locations.get(key, {})
+        if coordinate_pair(location.get("lat"), location.get("lng")) and location_matches_address(record, location, digest):
+            continue
+        candidates.append((record, key, query, digest))
 
     if not candidates:
         return []
@@ -328,9 +379,8 @@ def geocode_missing_locations(
     warnings: list[str] = []
     updated = False
     attempted = 0
-    for record, key, query in candidates:
+    for record, key, query, digest in candidates:
         name = clean_text(record.get(COMMERCIAL_NAME_FIELD)) or "Tienda sin nombre"
-        digest = address_hash(GEOCODER_SEARCH_VERSION + "\n" + "\n".join(geocode_queries(record, query)))
         cached = locations.get(key, {})
         if cached.get("geocode_status") == "unresolved" and cached.get("geocode_query_hash") == digest:
             try:
@@ -368,6 +418,7 @@ def geocode_missing_locations(
                 "name": name,
                 "city": display_city(record.get("city")),
                 "province": display_province(record.get("state_id")),
+                "address": display_address(record),
                 "geocode_status": "unresolved",
                 "geocode_query_hash": digest,
                 "geocode_reason": reason,
@@ -384,6 +435,7 @@ def geocode_missing_locations(
             "name": name,
             "city": display_city(record.get("city")),
             "province": display_province(record.get("state_id")),
+            "address": display_address(record),
             "lat": lat,
             "lng": lng,
             "coordinate_source": "CartoCiudad (IGN-CNIG)",
@@ -597,13 +649,13 @@ def build_public_stores(
         location = locations.get(key)
         override_pair = coordinate_pair(location.get("lat"), location.get("lng")) if location else None
         odoo_pair = coordinate_pair(record.get("partner_latitude"), record.get("partner_longitude"))
-        pair = override_pair or odoo_pair
+        pair = odoo_pair or override_pair
         lat, lng = pair if pair else (None, None)
         city = clean_text(location.get("city")) if location else None
         province = clean_text(location.get("province")) if location else None
         city = city or display_city(record.get("city"))
         province = province or display_province(record.get("state_id"))
-        address = clean_text(location.get("address")) if location else None
+        address = display_address(record) or (clean_text(location.get("address")) if location else None)
 
         if not city and not province:
             raise SyncError("Una tienda no tiene ciudad ni provincia; se detuvo la publicación.")
