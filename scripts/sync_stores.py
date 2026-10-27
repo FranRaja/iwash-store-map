@@ -75,12 +75,12 @@ def display_city(value: Any) -> str | None:
         return None
     if city.isupper():
         return city.title()
+    return city
 
 
 def display_address(record: dict[str, Any]) -> str | None:
     parts = [clean_text(record.get("street")), clean_text(record.get("street2"))]
     return ", ".join(part for part in parts if part) or None
-    return city
 
 
 def display_province(value: Any) -> str | None:
