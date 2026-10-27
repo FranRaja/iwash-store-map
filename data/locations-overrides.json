@@ -75,21 +75,27 @@
     "name": "IWASH CARTAGENA",
     "city": "Cartagena",
     "province": "Murcia",
-    "address": "C/ mayor 2 bajo",
-    "lat": 37.6051,
-    "lng": -0.9862
+    "address": "C/ SAN AGUSTIN 2, bajo",
+    "lat": 37.59951101187468,
+    "lng": -0.9868131257676485,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "portal-exacto",
+    "matched_address": "CALLE SAN AGUSTIN 2, Cartagena",
+    "geocode_query_hash": "73080692421378eacd7bfc9f1b2554593df0b3a164309582cd26b7e223b46d02",
+    "geocoded_at": "2026-10-27T12:20:55+00:00"
   },
   {
     "name": "IWASH CASTELLÓN",
     "city": "San Jordi",
     "province": "Castellón",
+    "address": "Avenida Castellón, Centro Comercial - Módulo k6 Panorámica Golf",
     "lat": 40.54985006764521,
     "lng": 0.3645883572477273,
     "coordinate_source": "CartoCiudad (IGN-CNIG)",
     "match_type": "referencia-recinto",
     "matched_address": "Panorámica Golf, Urbanización Panorámica (Sant Jordi/San Jorge)",
-    "geocode_query_hash": "41a9171506ba1993303d590021574011a5421ca565179d5b61f2a5a0ece03e41",
-    "geocoded_at": "2026-10-26T10:20:03+00:00"
+    "geocode_query_hash": "bc6ae9b4565ced150ce3c22cc58ec7a4cee720e065bf6561ef140cbbaee8adfd",
+    "geocoded_at": "2026-10-27T12:21:15+00:00"
   },
   {
     "name": "IWASH CC COLOMBIA",
@@ -199,9 +205,14 @@
     "name": "IWASH HORTALEZA",
     "city": "Madrid",
     "province": "Madrid",
-    "address": "C. de las Cuevas de Almanzora, 187",
-    "lat": 40.475,
-    "lng": -3.645
+    "address": "Calle Silvano 157, 2C",
+    "lat": 40.46274620643775,
+    "lng": -3.626291490403576,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "portal-exacto",
+    "matched_address": "CALLE SILVANO 157, Madrid",
+    "geocode_query_hash": "38eedac1ed686d4b9f4696f0d1a42db76d121b74a308d6b68f35038db78182ce",
+    "geocoded_at": "2026-10-27T12:21:00+00:00"
   },
   {
     "name": "IWASH LA RODA DE ANDALUCÍA",
@@ -263,10 +274,11 @@
     "name": "IWASH MIGUEL ESTEBAN",
     "city": "Miguel Esteban",
     "province": "Toledo",
+    "address": "C. SEVERO OCHOA S/N CRUCE CRTA ALCAZAR",
     "geocode_status": "unresolved",
-    "geocode_query_hash": "335a7bcb9659ca5cf94e243ba196c8f0068107cccff358572a629d035d603407",
+    "geocode_query_hash": "9cd7a02de771cbaabee15b16455f54d26f44ebd56a1ecec1d81df58451c731e4",
     "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
-    "geocoded_at": "2026-10-26T10:23:40+00:00"
+    "geocoded_at": "2026-10-27T12:21:20+00:00"
   },
   {
     "name": "IWASH MOLLET DEL VALLES",
@@ -288,9 +300,11 @@
     "name": "IWASH MURCIA",
     "city": "Murcia",
     "province": "Murcia",
-    "address": "C. Arquitecto Emilio Pérez Piñero nº 11",
-    "lat": 37.9922,
-    "lng": -1.1307
+    "address": "C. Arquitecto Emilio Pérez Piñero n° 11",
+    "geocode_status": "unresolved",
+    "geocode_query_hash": "e865de68ee39d354b28ad0d5cfea10195208cd4c2660178bd6a9b714a6ef23d2",
+    "geocode_reason": "CartoCiudad no devolvió un portal con coordenadas que coincida con la dirección",
+    "geocoded_at": "2026-10-27T12:21:04+00:00"
   },
   {
     "name": "IWASH NERJA",
@@ -384,21 +398,27 @@
     "name": "IWASH SAN SEBASTIAN",
     "city": "San Sebastián",
     "province": "Guipúzcoa",
+    "address": "Avenida de Navarra 24",
     "lat": 43.324532375487564,
     "lng": -1.9694006707496892,
     "coordinate_source": "CartoCiudad (IGN-CNIG)",
     "match_type": "portal-exacto",
     "matched_address": "HI NAVARRA 24, Donostia/San Sebastián",
-    "geocode_query_hash": "e1b88d57d7fb2ec1f307b3ce7a5931079a9850d9bbea18538710cc5baa014aa0",
-    "geocoded_at": "2026-10-26T10:23:36+00:00"
+    "geocode_query_hash": "f3908b73c289ac734c997353db1f587917fdf949c63de8a55e36f6814f9ae19c",
+    "geocoded_at": "2026-10-27T12:21:08+00:00"
   },
   {
     "name": "IWASH Sant Pere de Riudebitlles",
     "city": "Sant Pere de Riudebitlles",
     "province": "Barcelona",
-    "address": "Carrer la Carretera, 41",
-    "lat": 41.446,
-    "lng": 1.704
+    "address": "Carrer la Carretera, 48",
+    "lat": 41.45068556372861,
+    "lng": 1.703347299989631,
+    "coordinate_source": "CartoCiudad (IGN-CNIG)",
+    "match_type": "portal-exacto",
+    "matched_address": "AVENIDA CARRETERA LA 48, Sant Pere de Riudebitlles",
+    "geocode_query_hash": "3841f4fed6ed5b0ff2979365c4a47ff54d3e4b5d050b844f126f75401e1acc75",
+    "geocoded_at": "2026-10-27T12:20:58+00:00"
   },
   {
     "name": "IWASH SANTANDER",
@@ -412,13 +432,14 @@
     "name": "IWASH SEGOVIA",
     "city": "Segovia",
     "province": "Segovia",
+    "address": "Calle Juan Bravo, 6, Local Comercial- Escalera 1-Bajo-P9",
     "lat": 40.94914144810995,
     "lng": -4.122995874740874,
     "coordinate_source": "CartoCiudad (IGN-CNIG)",
     "match_type": "portal-exacto",
     "matched_address": "CALLE JUAN BRAVO 6, Segovia",
-    "geocode_query_hash": "3173dfb1bf856d59b8b132bf42e5f7b2ee1617817e5bb950a9e1d6601538ba5e",
-    "geocoded_at": "2026-10-26T10:19:59+00:00"
+    "geocode_query_hash": "7e13aeb3e90ac45e7c92f3c63b4cf69918681fa5d60739da7d4da8b1f7e8a4d3",
+    "geocoded_at": "2026-10-27T12:21:10+00:00"
   },
   {
     "name": "IWASH SOHO",
